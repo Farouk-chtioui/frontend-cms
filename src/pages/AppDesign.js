@@ -1,17 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Box,
   Typography,
-  Grid,
   TextField,
   RadioGroup,
   FormControlLabel,
   Radio,
   ClickAwayListener,
+  Tabs,
+  Tab,
+  Grid,
 } from '@mui/material';
 import { SketchPicker } from 'react-color';
-import { Tabs, Tab } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -61,6 +62,15 @@ const AppDesign = () => {
     }));
   };
 
+  // Handle manual hex code input
+  const handleHexInputChange = (e, key) => {
+    const value = e.target.value;
+    setColors((prevColors) => ({
+      ...prevColors,
+      [key]: value,
+    }));
+  };
+
   // Handle click outside of color picker to close it
   const handleClickAway = (key) => {
     setShowColorPicker((prevState) => ({
@@ -93,7 +103,7 @@ const AppDesign = () => {
   // Common function to render color input fields
   const renderColorInput = (items) => {
     return items.map((item) => (
-      <Grid item xs={12} sm={6} md={4} key={item.key}>
+      <Grid item xs={12} sm={6} md={3} key={item.key}>
         <Box position="relative" mb={2}>
           <Box display="flex" alignItems="center">
             <Box
@@ -111,11 +121,8 @@ const AppDesign = () => {
             <TextField
               label={item.label}
               value={colors[item.key]}
-              InputProps={{
-                readOnly: true,
-              }}
               size="small"
-              onClick={() => toggleColorPicker(item.key)}
+              onChange={(e) => handleHexInputChange(e, item.key)}
               sx={{
                 maxWidth: 200,
                 '& .MuiOutlinedInput-root': {
@@ -248,7 +255,6 @@ const AppDesign = () => {
         </RadioGroup>
       </Box>
 
-      {/* Save Changes & Reset Buttons */}
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid item xs={12} sm={6}>
           <Button variant="contained" color="primary" fullWidth onClick={saveChanges}>

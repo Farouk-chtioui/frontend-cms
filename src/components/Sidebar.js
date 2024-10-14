@@ -3,7 +3,6 @@ import React from 'react';
 import { Drawer, List, ListItem, ListItemText, ListItemIcon, Divider, Typography } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
-// Icons for main menu
 import DashboardIcon from '@mui/icons-material/Home';
 import DesignServicesIcon from '@mui/icons-material/Brush';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
@@ -56,19 +55,19 @@ const Sidebar = () => {
             key={index}
             sx={{
               '&:hover .MuiListItemText-root': {
-                color: '#6D6CFE', // Only change text color on hover
+                color: '#6D6CFE',
               },
               '&:hover .MuiListItemIcon-root': {
-                color: '#6D6CFE', // Only change icon color on hover
+                color: '#6D6CFE', 
               },
-              color: location.pathname === item.path ? '#6D6CFE' : '#424242', // Highlight active item
+              color: location.pathname === item.path ? '#6D6CFE' : '#424242', 
               '& .MuiListItemText-root': {
-                color: location.pathname === item.path ? '#6D6CFE' : '#424242', // Set text color for active
+                color: location.pathname === item.path ? '#6D6CFE' : '#424242', 
               },
               '& .MuiListItemIcon-root': {
-                color: location.pathname === item.path ? '#6D6CFE' : '#424242', // Set icon color for active
+                color: location.pathname === item.path ? '#6D6CFE' : '#424242', 
               },
-              backgroundColor: 'transparent', // No background change on hover
+              backgroundColor: 'transparent',
             }}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
