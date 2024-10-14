@@ -10,7 +10,7 @@ import {
   ClickAwayListener,
   Tabs,
   Tab,
-  Grid,
+  Grid2,
 } from '@mui/material';
 import { SketchPicker } from 'react-color';
 import { useParams } from 'react-router-dom';
@@ -65,10 +65,12 @@ const AppDesign = () => {
   // Handle manual hex code input
   const handleHexInputChange = (e, key) => {
     const value = e.target.value;
-    setColors((prevColors) => ({
-      ...prevColors,
-      [key]: value,
-    }));
+    if (/^#[0-9A-F]{6}$/i.test(value)) { // Validate hex code format
+      setColors((prevColors) => ({
+        ...prevColors,
+        [key]: value,
+      }));
+    }
   };
 
   // Handle click outside of color picker to close it
@@ -88,10 +90,10 @@ const AppDesign = () => {
   const saveChanges = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:3001/repositories/${repoId}/mobile-apps/${appId}/theme`,
+        `http://localhost:3001/repositories/${repoId}/mobile-apps/${appId}/theme`, // Save colors for this specific mobile app
         colors,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }, // Authentication
         }
       );
       console.log('Theme settings saved:', response.data);
@@ -99,11 +101,12 @@ const AppDesign = () => {
       console.error('Error saving theme settings:', error);
     }
   };
+  
 
   // Common function to render color input fields
   const renderColorInput = (items) => {
     return items.map((item) => (
-      <Grid item xs={12} sm={6} md={3} key={item.key}>
+      <Grid2 item xs={12} sm={6} md={1.5} key={item.key}>
         <Box position="relative" mb={2}>
           <Box display="flex" alignItems="center">
             <Box
@@ -122,7 +125,8 @@ const AppDesign = () => {
               label={item.label}
               value={colors[item.key]}
               size="small"
-              onChange={(e) => handleHexInputChange(e, item.key)}
+              onChange={(e) => handleHexInputChange(e, item.key)} // Handle manual hex input
+              onClick={() => toggleColorPicker(item.key)}
               sx={{
                 maxWidth: 200,
                 '& .MuiOutlinedInput-root': {
@@ -148,7 +152,7 @@ const AppDesign = () => {
             </ClickAwayListener>
           )}
         </Box>
-      </Grid>
+      </Grid2>
     ));
   };
 
@@ -178,12 +182,12 @@ const AppDesign = () => {
         <Typography variant="h6" gutterBottom>
           App Background
         </Typography>
-        <Grid container spacing={2}>
+        <Grid2 container spacing={2}>
           {renderColorInput([
             { label: 'Background Color', key: 'backgroundColor' },
             { label: 'Secondary Background Color', key: 'secondaryBackgroundColor' },
           ])}
-        </Grid>
+        </Grid2>
       </Box>
 
       {/* Text Colors */}
@@ -191,13 +195,13 @@ const AppDesign = () => {
         <Typography variant="h6" gutterBottom>
           Text
         </Typography>
-        <Grid container spacing={2}>
+        <Grid2 container spacing={2}>
           {renderColorInput([
             { label: 'Main Text Color', key: 'mainTextColor' },
             { label: 'Title Text Color', key: 'titleTextColor' },
             { label: 'Important Info Text Color', key: 'importantInformationTextColor' },
           ])}
-        </Grid>
+        </Grid2>
       </Box>
 
       {/* Accent Colors */}
@@ -205,12 +209,12 @@ const AppDesign = () => {
         <Typography variant="h6" gutterBottom>
           Accent
         </Typography>
-        <Grid container spacing={2}>
+        <Grid2 container spacing={2}>
           {renderColorInput([
             { label: 'Accent Color', key: 'accentColor' },
             { label: 'Secondary Accent Color', key: 'secondaryAccentColor' },
           ])}
-        </Grid>
+        </Grid2>
       </Box>
 
       {/* Bottom Bar Colors */}
@@ -218,13 +222,13 @@ const AppDesign = () => {
         <Typography variant="h6" gutterBottom>
           Bottom Bar
         </Typography>
-        <Grid container spacing={2}>
+        <Grid2 container spacing={2}>
           {renderColorInput([
             { label: 'Background Color', key: 'bottomBarBackgroundColor' },
             { label: 'Selected Icon Color', key: 'bottomBarSelectedIconColor' },
             { label: 'Unselected Icon Color', key: 'bottomBarUnselectedIconColor' },
           ])}
-        </Grid>
+        </Grid2>
       </Box>
 
       {/* Top Bar Colors */}
@@ -232,12 +236,12 @@ const AppDesign = () => {
         <Typography variant="h6" gutterBottom>
           Top Bar
         </Typography>
-        <Grid container spacing={2}>
+        <Grid2 container spacing={2}>
           {renderColorInput([
             { label: 'Background Color', key: 'topBarBackgroundColor' },
             { label: 'Icon & Text Color', key: 'topBarIconTextColor' },
           ])}
-        </Grid>
+        </Grid2>
       </Box>
 
       {/* Status Bar Theme */}
@@ -255,18 +259,18 @@ const AppDesign = () => {
         </RadioGroup>
       </Box>
 
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
-        <Grid item xs={12} sm={6}>
+      <Grid2 container spacing={2} sx={{ marginTop: 2 }}>
+        <Grid2 item xs={12} sm={6}>
           <Button variant="contained" color="primary" fullWidth onClick={saveChanges}>
             Save Changes
           </Button>
-        </Grid>
-        <Grid item xs={12} sm={6}>
+        </Grid2>
+        <Grid2 item xs={12} sm={6}>
           <Button variant="outlined" color="secondary" fullWidth onClick={resetColors}>
             Reset to Default
           </Button>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
     </Box>
   );
 };

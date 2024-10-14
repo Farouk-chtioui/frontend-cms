@@ -1,16 +1,28 @@
 // src/components/Sidebar.js
 import React from 'react';
 import { Drawer, List, ListItem, ListItemText, ListItemIcon, Divider, Typography } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import DashboardIcon from '@mui/icons-material/Home';
 import DesignServicesIcon from '@mui/icons-material/Brush';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import ForumIcon from '@mui/icons-material/Forum';
 import InsightsIcon from '@mui/icons-material/Insights';
+import LogoutIcon from '@mui/icons-material/Logout'; // Import LogoutIcon
 
 const Sidebar = () => {
   const location = useLocation(); // Get the current path
+  const navigate = useNavigate(); // Initialize navigate
+
+  // Logout handler function
+  const handleLogout = () => {
+    // Remove userid and token from localStorage
+    localStorage.removeItem('userid');
+    localStorage.removeItem('token');
+
+    // Redirect to login page
+    navigate('/login');
+  };
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -106,6 +118,33 @@ const Sidebar = () => {
             <ListItemText primary={item.text} sx={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400 }} />
           </ListItem>
         ))}
+      </List>
+      <Divider />
+      {/* Logout Option */}
+      <List>
+        <ListItem
+          button
+          onClick={handleLogout} // Call handleLogout on click
+          sx={{
+            '&:hover .MuiListItemText-root': {
+              color: '#6D6CFE',
+            },
+            '&:hover .MuiListItemIcon-root': {
+              color: '#6D6CFE', 
+            },
+            color: '#424242', 
+            '& .MuiListItemText-root': {
+              color: '#424242', 
+            },
+            '& .MuiListItemIcon-root': {
+              color: '#424242', 
+            },
+            backgroundColor: 'transparent',
+          }}
+        >
+          <ListItemIcon><LogoutIcon /></ListItemIcon>
+          <ListItemText primary="Logout" sx={{ fontFamily: 'Roboto, sans-serif', fontWeight: 400 }} />
+        </ListItem>
       </List>
     </Drawer>
   );

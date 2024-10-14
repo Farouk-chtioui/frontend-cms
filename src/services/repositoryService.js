@@ -1,17 +1,15 @@
 // src/services/repositoryService.js
+
 import axios from 'axios';
-import authService from './authService'; // Use authService to include authentication headers
 
-const API_URL = 'http://localhost:3001/repositories'; // Update to match your backend URL
+const API_BASE_URL = 'http://localhost:3001';
 
-// Create a new repository
-const createRepository = async (repoData) => {
-  return await axios.post(API_URL, repoData, authService.getAuthHeader());
+const createRepository = (repoData) => {
+  return axios.post(`${API_BASE_URL}/repositories`, repoData);  // Ensure repoData includes the owner
 };
 
-// Fetch repositories for the authenticated user
-const getRepositories = async () => {
-  return await axios.get(API_URL, authService.getAuthHeader());
+const getRepositories = (userId) => {
+  return axios.get(`${API_BASE_URL}/repositories`, { params: { userId } });
 };
 
 export default {

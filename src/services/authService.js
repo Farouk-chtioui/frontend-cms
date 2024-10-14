@@ -5,12 +5,20 @@ const API_URL = 'http://localhost:3001/auth'; // Update to match your backend UR
 
 // Login function
 const login = async (credentials) => {
-  const response = await axios.post(`${API_URL}/login`, credentials);
-  const { token, userId } = response.data;
+  try {
+    const response = await axios.post(`${API_URL}/login`, credentials);
+    
+    const { access_token, userId } = response.data;
+    console.log('Received userId:', userId); // Verify that userId is returned
 
-  // Store the token and userId in localStorage
-  localStorage.setItem('token', token);
-  localStorage.setItem('userId', userId);
+    // Store the token and userId in localStorage
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('userId', userId);
+
+    console.log('Login successful, token and userId saved');
+  } catch (error) {
+    console.error('Login failed:', error); // Log any errors
+  }
 };
 
 // Logout function
