@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { SketchPicker } from 'react-color';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import mobileAppService from '../services/mobileAppService';
 
 const AppDesign = () => {
   const { repoId, appId } = useParams(); // Get repoId and appId from the route
@@ -88,19 +88,30 @@ const AppDesign = () => {
 
   // Save theme changes and send them to the backend
   const saveChanges = async () => {
+    const repo = JSON.parse(localStorage.getItem('selectedRepo'));
+    console.log('Selected repository:', repo);
+  
+    if (!repo) {
+      console.error('Selected repository not found in local storage');
+      return;
+    }
+  
+    const mobileAppId = repo.mobileApp._id;
+    console.log('Mobile App ID:', mobileAppId);
+  
+    if (!mobileAppId) {
+      console.error('Mobile App ID not found');
+      return;
+    }
+  
     try {
-      const response = await axios.put(
-        `http://localhost:3001/repositories/${repoId}/mobile-apps/${appId}/theme`, // Save colors for this specific mobile app
-        colors,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }, // Authentication
-        }
-      );
+      const response = await mobileAppService.updateMobileAppDesign(mobileAppId, colors);
       console.log('Theme settings saved:', response.data);
     } catch (error) {
       console.error('Error saving theme settings:', error);
     }
   };
+  
   
 
   // Common function to render color input fields

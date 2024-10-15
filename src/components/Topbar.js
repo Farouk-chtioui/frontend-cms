@@ -1,5 +1,3 @@
-// src/components/Topbar.js
-
 import React, { useState, useEffect } from "react";
 import {
   AppBar,
@@ -15,31 +13,42 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import PublishIcon from "@mui/icons-material/Publish";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import repositoryService from "../services/repositoryService";
 
 const Topbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [projects, setProjects] = useState([]);
   const [newRepoName, setNewRepoName] = useState("");
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedRepo, setSelectedRepo] = useState(null); // Track selected repository
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false); // For delete confirmation
 
   // Fetch repositories on component load
   useEffect(() => {
     fetchRepositories();
+    
+    // Load selected repository from localStorage
+    const savedRepo = localStorage.getItem('selectedRepo');
+    if (savedRepo) {
+      setSelectedRepo(JSON.parse(savedRepo)); // Set from localStorage if available
+    }
   }, []);
 
   // Function to fetch repositories
   const fetchRepositories = async () => {
     try {
-      const userId = localStorage.getItem('userId'); // Use 'userId'
+      const userId = localStorage.getItem('userId');
       if (!userId) {
         console.error('userId not found in localStorage');
         return;
@@ -51,16 +60,25 @@ const Topbar = () => {
     }
   };
 
-  // Filter projects based on search input
-  const filteredProjects = projects.filter((project) =>
-    project.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  // Function to handle repository selection and save to localStorage
+  const handleSelectRepository = (project) => {
+    // Check if there is an existing selected repository
+    const existingRepo = localStorage.getItem('selectedRepo');
+    if (existingRepo) {
+      // Remove the old selected repository
+      localStorage.removeItem('selectedRepo');
+    }
+  
+    // Set the new selected repository
+    setSelectedRepo(project);
+    localStorage.setItem('selectedRepo', JSON.stringify(project)); // Save selection to localStorage
+  };
+  
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
     setIsOpen(true);
   };
-
+  
   const handleMenuClose = () => {
     setAnchorEl(null);
     setIsOpen(false);
@@ -69,13 +87,11 @@ const Topbar = () => {
   const handleCreateRepository = async () => {
     try {
       const userId = localStorage.getItem('userId');
-      console.log('userId:', userId); // Add this to debug
-  
       if (!userId) {
         console.error('userId is null or undefined');
         return;
       }
-  
+      console.log("userId", userId);
       await repositoryService.createRepository({ name: newRepoName, owner: userId });
       fetchRepositories();
       setShowCreateDialog(false);
@@ -84,8 +100,6 @@ const Topbar = () => {
       console.error('Failed to create repository', error);
     }
   };
-  
-  
 
   return (
     <>
@@ -136,8 +150,8 @@ const Topbar = () => {
                 <Typography variant="subtitle2">My projects</Typography>
               </MenuItem>
 
-              {filteredProjects.map((project, index) => (
-                <MenuItem key={index} onClick={handleMenuClose}>
+              {projects.map((project, index) => (
+                <MenuItem key={index} onClick={() => handleSelectRepository(project)}>
                   <IconButton
                     sx={{
                       backgroundColor: "#00d2c6",
@@ -175,28 +189,13 @@ const Topbar = () => {
               </MenuItem>
             </Menu>
 
-            {/* Last published date */}
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              sx={{ ml: 4, display: { xs: "none", sm: "block" } }}
-            >
-              Last published 19 Oct. 2022 13:23 by Fares Abderrazak
-            </Typography>
-          </Box>
-
-          {/* Right Section - Publish button and profile */}
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Button
-              variant="contained"
-              startIcon={<PublishIcon />}
-              sx={{ backgroundColor: "#4caf50" }}
-            >
-              Publish
-            </Button>
-
-            <Avatar sx={{ bgcolor: "#00d2c6", ml: 2 }}>F</Avatar>
-            <Typography sx={{ ml: 1 }}>FaFares</Typography>
+            {selectedRepo && (
+              <Box sx={{ ml: 4 }}>
+                <Typography variant="h6">
+                  Selected Repository: {selectedRepo.name}
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Toolbar>
       </AppBar>

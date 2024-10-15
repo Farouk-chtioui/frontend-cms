@@ -2,25 +2,26 @@
 import axios from 'axios';
 import authService from './authService';
 
-const API_URL = 'http://localhost:3001/repositories'; // Base URL for repositories and mobile apps
+// Base URL for mobile apps
+const API_URL_MOBILE_APP = 'http://localhost:3001/mobile-apps';
 
-// Create a mobile app within a repository
-const createMobileApp = async (repoId, appData) => {
-  return await axios.post(`${API_URL}/${repoId}/mobile-apps`, appData, authService.getAuthHeader());
+// Create a mobile app
+const createMobileApp = async (appData) => {
+  return await axios.post(`${API_URL_MOBILE_APP}`, appData, { headers: authService.getAuthHeader() });
 };
 
-// Update a mobile app's theme within a repository
-const updateMobileAppTheme = async (repoId, appId, themeData) => {
-  return await axios.put(`${API_URL}/${repoId}/mobile-apps/${appId}/theme`, themeData, authService.getAuthHeader());
+// Update the design of a mobile app
+const updateMobileAppDesign = async (mobileAppId, designData) => {
+  return await axios.put(`${API_URL_MOBILE_APP}/${mobileAppId}/design`, designData, { headers: authService.getAuthHeader() });
 };
 
-// Fetch a specific mobile app's details
-const getMobileAppById = async (repoId, appId) => {
-  return await axios.get(`${API_URL}/${repoId}/mobile-apps/${appId}`, authService.getAuthHeader());
+// Fetch a specific mobile app's details by ID
+const getMobileAppById = async (appId) => {
+  return await axios.get(`${API_URL_MOBILE_APP}/${appId}`, { headers: authService.getAuthHeader() });
 };
 
 export default {
   createMobileApp,
-  updateMobileAppTheme,
+  updateMobileAppDesign,
   getMobileAppById,
 };
