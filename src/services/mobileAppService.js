@@ -4,7 +4,6 @@ import authService from './authService';
 
 const API_URL_MOBILE_APP = 'http://localhost:3001/mobile-app';
 
-// Create a mobile app
 const createMobileApp = async (appData) => {
   return await axios.post(`${API_URL_MOBILE_APP}`, appData, { headers: authService.getAuthHeader() });
 };

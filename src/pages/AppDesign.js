@@ -97,7 +97,6 @@ const AppDesign = () => {
   
   
 
-  // Common function to render color input fields
   const renderColorInput = (items) => {
     return items.map((item) => (
       <Grid2 item xs={12} sm={6} md={1.5} key={item.key}>

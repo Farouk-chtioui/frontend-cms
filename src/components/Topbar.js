@@ -28,13 +28,12 @@ const Topbar = () => {
   const [repositoryName, setNewRepoName] = useState("");
   const [selectedRepo, setSelectedRepo] = useState(null);
 
-  // Fetch repositories on component load
   useEffect(() => {
     fetchRepositories();
 
     const savedRepo = localStorage.getItem('selectedRepo');
     if (savedRepo) {
-      setSelectedRepo(JSON.parse(savedRepo)); // Set from localStorage if available
+      setSelectedRepo(JSON.parse(savedRepo));
     }
   }, []);
 
@@ -97,12 +96,11 @@ const Topbar = () => {
           color: "#424242",
           boxShadow: "none",
           borderBottom: "1px solid #e0e0e0",
-          width: `calc(100% - 240px)`, // Adjust for Sidebar width
-          ml: "240px", // Margin left for Sidebar
+          width: `calc(100% - 240px)`, 
+          ml: "240px", 
         }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Left Section - Project Dropdown */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               onClick={handleMenuClick}
@@ -124,7 +122,6 @@ const Topbar = () => {
               sx={{ cursor: "pointer", ml: 1, color: "#424242" }}
             />
 
-            {/* Dropdown content */}
             <Menu
               anchorEl={anchorEl}
               open={isOpen}
@@ -195,10 +192,9 @@ const Topbar = () => {
             )}
           </Box>
 
-          {/* Right Section - User Profile */}
           <Box>
             <Typography variant="h6" sx={{ color: "#424242", fontFamily: "Roboto, sans-serif" }}>
-              Welcome, User
+              Welcome, {localStorage.getItem('username')}
             </Typography>
           </Box>
         </Toolbar>

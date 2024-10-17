@@ -8,15 +8,15 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Use navigate instead of history
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await authService.login({ username, password }); // Login user
-      navigate('/dashboard'); // Redirect to dashboard on success
+      await authService.login({ username, password }); 
+      navigate('/dashboard'); 
     } catch (err) {
-      setError('Invalid login credentials'); // Show error if login fails
+      setError('Invalid login credentials'); 
     }
   };
 

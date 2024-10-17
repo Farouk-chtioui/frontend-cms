@@ -8,15 +8,15 @@ import authService from '../services/authService';
 const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
 
-  // Check if user is authenticated, otherwise redirect to login
+
   useEffect(() => {
     if (!authService.isAuthenticated()) {
-      navigate('/login'); // Redirect to login if not authenticated
+      navigate('/login'); 
     }
   }, [navigate]);
 
   if (!authService.isAuthenticated()) {
-    return null; // Return nothing if the user is not authenticated
+    return null; 
   }
 
   return (
@@ -32,13 +32,13 @@ const DashboardLayout = ({ children }) => {
           sx={{
             flexGrow: 1,
             padding: 3,
-            backgroundColor: '#f5f5f5',  // Optional light background for the content
-            overflow: 'auto',            // Ensure scrolling if content overflows
-            marginTop: '64px',           // Space for the fixed Topbar height
+            backgroundColor: '#f5f5f5', 
+            overflow: 'auto',            
+            marginTop: '60px',           
           }}
         >
           <Grid container spacing={3}>
-            {children}  {/* This will contain the content passed to the layout */}
+            {children}  
           </Grid>
         </Box>
       </Box>
