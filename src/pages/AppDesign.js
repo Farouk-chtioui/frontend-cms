@@ -13,11 +13,9 @@ import {
   Grid2,
 } from '@mui/material';
 import { SketchPicker } from 'react-color';
-import { useParams } from 'react-router-dom';
 import mobileAppService from '../services/mobileAppService';
 
 const AppDesign = () => {
-  const { repoId, appId } = useParams(); // Get repoId and appId from the route
 
   const [theme, setTheme] = useState('light');
   const initialColors = {

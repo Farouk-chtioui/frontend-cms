@@ -5,7 +5,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Button,
   Typography,
   TextField,
   Box,
@@ -13,6 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Button,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
@@ -31,14 +31,13 @@ const Topbar = () => {
   // Fetch repositories on component load
   useEffect(() => {
     fetchRepositories();
-    
+
     const savedRepo = localStorage.getItem('selectedRepo');
     if (savedRepo) {
       setSelectedRepo(JSON.parse(savedRepo)); // Set from localStorage if available
     }
   }, []);
 
-  // Function to fetch repositories
   const fetchRepositories = async () => {
     try {
       const userId = localStorage.getItem('userId');
@@ -58,9 +57,9 @@ const Topbar = () => {
     if (existingRepo) {
       localStorage.removeItem('selectedRepo');
     }
-  
+
     setSelectedRepo(project);
-    localStorage.setItem('selectedRepo', JSON.stringify(project)); 
+    localStorage.setItem('selectedRepo', JSON.stringify(project));
   };
 
   const handleMenuClick = (event) => {
@@ -91,14 +90,24 @@ const Topbar = () => {
 
   return (
     <>
-      <AppBar position="static" color="default" elevation={0}>
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: "#fff",
+          color: "#424242",
+          boxShadow: "none",
+          borderBottom: "1px solid #e0e0e0",
+          width: `calc(100% - 240px)`, // Adjust for Sidebar width
+          ml: "240px", // Margin left for Sidebar
+        }}
+      >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           {/* Left Section - Project Dropdown */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               onClick={handleMenuClick}
               sx={{
-                backgroundColor: "#00d2c6",
+                backgroundColor: "#6D6CFE",
                 borderRadius: 2,
                 color: "#fff",
                 p: 1,
@@ -107,12 +116,12 @@ const Topbar = () => {
               ★
             </IconButton>
 
-            <Typography variant="h6" sx={{ ml: 1 }}>
+            <Typography variant="h6" sx={{ ml: 1, fontFamily: "Roboto, sans-serif", color: "#424242" }}>
               Projects
             </Typography>
             <ArrowDropDownIcon
               onClick={handleMenuClick}
-              sx={{ cursor: "pointer", ml: 1 }}
+              sx={{ cursor: "pointer", ml: 1, color: "#424242" }}
             />
 
             {/* Dropdown content */}
@@ -142,7 +151,7 @@ const Topbar = () => {
                 <MenuItem key={index} onClick={() => handleSelectRepository(project)}>
                   <IconButton
                     sx={{
-                      backgroundColor: "#00d2c6",
+                      backgroundColor: "#6D6CFE",
                       borderRadius: 2,
                       color: "#fff",
                       mr: 2,
@@ -151,7 +160,6 @@ const Topbar = () => {
                   >
                     ★
                   </IconButton>
-                  {/* Use repositoryName instead of name */}
                   <Typography>{project.repositoryName}</Typography>
                 </MenuItem>
               ))}
@@ -180,11 +188,18 @@ const Topbar = () => {
 
             {selectedRepo && (
               <Box sx={{ ml: 4 }}>
-                <Typography variant="h6">
+                <Typography variant="h6" sx={{ fontFamily: "Roboto, sans-serif", color: "#424242" }}>
                   Selected Repository: {selectedRepo.repositoryName}
                 </Typography>
               </Box>
             )}
+          </Box>
+
+          {/* Right Section - User Profile */}
+          <Box>
+            <Typography variant="h6" sx={{ color: "#424242", fontFamily: "Roboto, sans-serif" }}>
+              Welcome, User
+            </Typography>
           </Box>
         </Toolbar>
       </AppBar>
