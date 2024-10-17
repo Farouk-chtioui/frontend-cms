@@ -38,15 +38,12 @@ const AppDesign = () => {
 
   const [colors, setColors] = useState(initialColors);
 
-  // State to manage visibility of color pickers
   const [showColorPicker, setShowColorPicker] = useState({});
 
-  // Handle theme (light or dark) tab change
   const handleThemeChange = (event, newValue) => {
     setTheme(newValue);
   };
 
-  // Handle color change for each picker
   const handleColorChange = (color, key) => {
     setColors((prevColors) => ({
       ...prevColors,
@@ -54,7 +51,6 @@ const AppDesign = () => {
     }));
   };
 
-  // Toggle color picker visibility
   const toggleColorPicker = (key) => {
     setShowColorPicker((prevState) => ({
       ...prevState,
@@ -62,10 +58,9 @@ const AppDesign = () => {
     }));
   };
 
-  // Handle manual hex code input
   const handleHexInputChange = (e, key) => {
     const value = e.target.value;
-    if (/^#[0-9A-F]{6}$/i.test(value)) { // Validate hex code format
+    if (/^#[0-9A-F]{6}$/i.test(value)) {
       setColors((prevColors) => ({
         ...prevColors,
         [key]: value,
@@ -73,7 +68,6 @@ const AppDesign = () => {
     }
   };
 
-  // Handle click outside of color picker to close it
   const handleClickAway = (key) => {
     setShowColorPicker((prevState) => ({
       ...prevState,
@@ -81,36 +75,27 @@ const AppDesign = () => {
     }));
   };
 
-  // Handle reset functionality
   const resetColors = () => {
-    setColors(initialColors); // Reset to default values
+    setColors(initialColors); 
   };
 
-  // Save theme changes and send them to the backend
   const saveChanges = async () => {
-    const repo = JSON.parse(localStorage.getItem('selectedRepo'));
-    console.log('Selected repository:', repo);
-  
-    if (!repo) {
-      console.error('Selected repository not found in local storage');
-      return;
-    }
-  
-    const mobileAppId = repo.mobileApp._id;
-    console.log('Mobile App ID:', mobileAppId);
-  
-    if (!mobileAppId) {
-      console.error('Mobile App ID not found');
+    const RepoId = JSON.parse(localStorage.getItem('selectedRepo'))._id;
+    
+    if (!RepoId) {
+      console.error('Repository ID not found');
       return;
     }
   
     try {
-      const response = await mobileAppService.updateMobileAppDesign(mobileAppId, colors);
+      const response = await mobileAppService.updateMobileAppDesignByRepoId(RepoId, colors);
       console.log('Theme settings saved:', response.data);
     } catch (error) {
       console.error('Error saving theme settings:', error);
     }
   };
+  
+  
   
   
 

@@ -5,18 +5,19 @@ import authService from './authService';
 
 const API_BASE_URL = 'http://localhost:3001';
 
-const createRepository = (repoData) => {
-  return axios.post(`${API_BASE_URL}/repositories`, repoData);  // Ensure repoData includes the owner
+const createRepository = async (repoData) => {
+  return await axios.post(`${API_BASE_URL}/repositories`, repoData, { headers: authService.getAuthHeader() });
 };
 
-const getRepositories = (userId) => {
-  return axios.get(`${API_BASE_URL}/repositories`, {
+const getRepositories = async (userId) => {
+  return await axios.get(`${API_BASE_URL}/repositories`, {
     params: { userId },
     headers: authService.getAuthHeader(),
   });
 };
-const deleteRepository = (repoId) => {
-  return axios.delete(`${API_BASE_URL}/repositories/user/${repoId}`);
+
+const deleteRepository = async (repoId) => {
+  return await axios.delete(`${API_BASE_URL}/repositories/user/${repoId}`, { headers: authService.getAuthHeader() });
 }
 
 export default {

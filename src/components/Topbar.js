@@ -9,36 +9,29 @@ import {
   Typography,
   TextField,
   Box,
-  Avatar,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
-import PublishIcon from "@mui/icons-material/Publish";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
 import repositoryService from "../services/repositoryService";
 
 const Topbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [projects, setProjects] = useState([]);
-  const [newRepoName, setNewRepoName] = useState("");
-  const [selectedRepo, setSelectedRepo] = useState(null); // Track selected repository
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false); // For delete confirmation
+  const [repositoryName, setNewRepoName] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState(null);
 
   // Fetch repositories on component load
   useEffect(() => {
     fetchRepositories();
     
-    // Load selected repository from localStorage
     const savedRepo = localStorage.getItem('selectedRepo');
     if (savedRepo) {
       setSelectedRepo(JSON.parse(savedRepo)); // Set from localStorage if available
@@ -60,25 +53,21 @@ const Topbar = () => {
     }
   };
 
-  // Function to handle repository selection and save to localStorage
   const handleSelectRepository = (project) => {
-    // Check if there is an existing selected repository
     const existingRepo = localStorage.getItem('selectedRepo');
     if (existingRepo) {
-      // Remove the old selected repository
       localStorage.removeItem('selectedRepo');
     }
   
-    // Set the new selected repository
     setSelectedRepo(project);
-    localStorage.setItem('selectedRepo', JSON.stringify(project)); // Save selection to localStorage
+    localStorage.setItem('selectedRepo', JSON.stringify(project)); 
   };
-  
+
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
     setIsOpen(true);
   };
-  
+
   const handleMenuClose = () => {
     setAnchorEl(null);
     setIsOpen(false);
@@ -91,8 +80,7 @@ const Topbar = () => {
         console.error('userId is null or undefined');
         return;
       }
-      console.log("userId", userId);
-      await repositoryService.createRepository({ name: newRepoName, owner: userId });
+      await repositoryService.createRepository({ repositoryName, ownerId: userId });
       fetchRepositories();
       setShowCreateDialog(false);
       setNewRepoName('');
@@ -163,7 +151,8 @@ const Topbar = () => {
                   >
                     ★
                   </IconButton>
-                  <Typography>{project.name}</Typography>
+                  {/* Use repositoryName instead of name */}
+                  <Typography>{project.repositoryName}</Typography>
                 </MenuItem>
               ))}
 
@@ -192,7 +181,7 @@ const Topbar = () => {
             {selectedRepo && (
               <Box sx={{ ml: 4 }}>
                 <Typography variant="h6">
-                  Selected Repository: {selectedRepo.name}
+                  Selected Repository: {selectedRepo.repositoryName}
                 </Typography>
               </Box>
             )}
@@ -211,7 +200,7 @@ const Topbar = () => {
             autoFocus
             label="Repository Name"
             fullWidth
-            value={newRepoName}
+            value={repositoryName}
             onChange={(e) => setNewRepoName(e.target.value)}
           />
         </DialogContent>
