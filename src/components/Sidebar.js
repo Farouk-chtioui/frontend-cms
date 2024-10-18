@@ -16,13 +16,15 @@ const Sidebar = () => {
 
   // Logout handler function
   const handleLogout = () => {
-    // Remove userid and token from localStorage
-    localStorage.removeItem('userid');
+    // Remove all relevant data, including selectedRepo
+    localStorage.removeItem('userId');
     localStorage.removeItem('token');
-
-    // Redirect to login page
+    localStorage.removeItem('username');
+    localStorage.removeItem('selectedRepo');  // Clear the selected repository on logout
+  
     navigate('/login');
   };
+  
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },

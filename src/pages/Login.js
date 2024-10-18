@@ -13,12 +13,15 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await authService.login({ username, password }); 
-      navigate('/dashboard'); 
+      await authService.login({ username, password });
+      localStorage.removeItem('selectedRepo'); 
+      navigate('/dashboard');
     } catch (err) {
-      setError('Invalid login credentials'); 
+      setError('Invalid login credentials'); // Display the error to the user
     }
   };
+  
+  
 
   return (
     <div className="login-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

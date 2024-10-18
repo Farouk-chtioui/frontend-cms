@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Box,
@@ -14,9 +14,9 @@ import {
 } from '@mui/material';
 import { SketchPicker } from 'react-color';
 import mobileAppService from '../services/mobileAppService';
+import { useRepo } from '../context/RepoContext';
 
 const AppDesign = () => {
-
   const [theme, setTheme] = useState('light');
   const initialColors = {
     backgroundColor: '#FFACC',
@@ -35,8 +35,30 @@ const AppDesign = () => {
   };
 
   const [colors, setColors] = useState(initialColors);
-
   const [showColorPicker, setShowColorPicker] = useState({});
+  const { selectedRepo } = useRepo();
+
+  useEffect(() => {
+    const fetchExistingDesign = async () => {
+      if (!selectedRepo) {
+        return;
+      }
+
+      try {
+        const response = await mobileAppService.findByRepoId(selectedRepo._id);
+        if (response.data && response.data.appDesignId) {
+          setColors(response.data.appDesignId); // Assuming the response contains appDesignId with design data
+        } else {
+          setColors(initialColors);
+        }
+      } catch (error) {
+        console.error('Error fetching existing design:', error);
+        setColors(initialColors);
+      }
+    };
+
+    fetchExistingDesign();
+  }, [selectedRepo]);
 
   const handleThemeChange = (event, newValue) => {
     setTheme(newValue);
@@ -78,24 +100,18 @@ const AppDesign = () => {
   };
 
   const saveChanges = async () => {
-    const RepoId = JSON.parse(localStorage.getItem('selectedRepo'))._id;
-    
-    if (!RepoId) {
+    if (!selectedRepo) {
       console.error('Repository ID not found');
       return;
     }
   
     try {
-      const response = await mobileAppService.updateMobileAppDesignByRepoId(RepoId, colors);
+      const response = await mobileAppService.updateMobileAppDesignByRepoId(selectedRepo._id, colors);
       console.log('Theme settings saved:', response.data);
     } catch (error) {
       console.error('Error saving theme settings:', error);
     }
   };
-  
-  
-  
-  
 
   const renderColorInput = (items) => {
     return items.map((item) => (

@@ -16,14 +16,18 @@ const getMobileAppById = async (appId) => {
   return await axios.get(`${API_URL_MOBILE_APP}/${appId}`, { headers: authService.getAuthHeader() });
 };
 
-
+const findByRepoId = async (repoId) => {
+  return await axios.get(`${API_URL_MOBILE_APP}/${repoId}/repository`, { headers: authService.getAuthHeader() });
+};
 
 const updateMobileAppDesignByRepoId = async (repoId, designData) => {
   return await axios.put(`${API_URL_MOBILE_APP}/${repoId}/repository`, designData, { headers: authService.getAuthHeader() });
+  
 }
 export default {
   createMobileApp,
   updateMobileAppDesign,
   getMobileAppById,
   updateMobileAppDesignByRepoId,
+  findByRepoId,
 };

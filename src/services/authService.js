@@ -7,13 +7,13 @@ const login = async (credentials) => {
   try {
     const response = await axios.post(`${API_URL}/login`, credentials);
     
-    const { access_token, userId ,username } = response.data;
+    const { access_token, userId, username } = response.data;
     localStorage.setItem('username', username);
     localStorage.setItem('token', access_token);
     localStorage.setItem('userId', userId);
-
   } catch (error) {
     console.error('Login failed:', error); 
+    throw error; // Re-throw the error to handle it in the calling function
   }
 };
 

@@ -18,6 +18,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import repositoryService from "../services/repositoryService";
+import { useRepo } from '../context/RepoContext';
 
 const Topbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,15 +27,10 @@ const Topbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [projects, setProjects] = useState([]);
   const [repositoryName, setNewRepoName] = useState("");
-  const [selectedRepo, setSelectedRepo] = useState(null);
+  const { selectedRepo, updateSelectedRepo } = useRepo();
 
   useEffect(() => {
     fetchRepositories();
-
-    const savedRepo = localStorage.getItem('selectedRepo');
-    if (savedRepo) {
-      setSelectedRepo(JSON.parse(savedRepo));
-    }
   }, []);
 
   const fetchRepositories = async () => {
@@ -52,13 +48,8 @@ const Topbar = () => {
   };
 
   const handleSelectRepository = (project) => {
-    const existingRepo = localStorage.getItem('selectedRepo');
-    if (existingRepo) {
-      localStorage.removeItem('selectedRepo');
-    }
-
-    setSelectedRepo(project);
-    localStorage.setItem('selectedRepo', JSON.stringify(project));
+    updateSelectedRepo(project);
+    handleMenuClose();
   };
 
   const handleMenuClick = (event) => {

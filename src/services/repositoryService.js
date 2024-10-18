@@ -10,7 +10,7 @@ const createRepository = async (repoData) => {
 };
 
 const getRepositories = async (userId) => {
-  return await axios.get(`${API_BASE_URL}/repositories`, {
+  return await axios.get(`${API_BASE_URL}/repositories/${userId}`, {
     params: { userId },
     headers: authService.getAuthHeader(),
   });
