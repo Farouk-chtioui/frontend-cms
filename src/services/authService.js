@@ -22,6 +22,7 @@ const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('username');
   localStorage.removeItem('userId');
+  localStorage.removeItem('selectedRepo');
 };
 
 const isAuthenticated = () => {

@@ -10,21 +10,17 @@ import ForumIcon from '@mui/icons-material/Forum';
 import InsightsIcon from '@mui/icons-material/Insights';
 import LogoutIcon from '@mui/icons-material/Logout'; // Import LogoutIcon
 
+import authService from '../services/authService'; // Import authService
+
 const Sidebar = () => {
   const location = useLocation(); // Get the current path
   const navigate = useNavigate(); // Initialize navigate
 
   // Logout handler function
   const handleLogout = () => {
-    // Remove all relevant data, including selectedRepo
-    localStorage.removeItem('userId');
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('selectedRepo');  // Clear the selected repository on logout
-  
+    authService.logout(); // Call logout from authService
     navigate('/login');
   };
-  
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },

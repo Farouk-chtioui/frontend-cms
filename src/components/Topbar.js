@@ -41,7 +41,15 @@ const Topbar = () => {
         return;
       }
       const response = await repositoryService.getRepositories(userId);
-      setProjects(response.data);
+      const fetchedRepos = response.data;
+
+      setProjects(fetchedRepos);
+
+      // Check if selectedRepo exists in the list
+      if (selectedRepo && !fetchedRepos.find(repo => repo.repositoryName === selectedRepo.repositoryName)) {
+        // If selectedRepo doesn't exist in the list, select the first one
+        updateSelectedRepo(fetchedRepos[0]);
+      }
     } catch (error) {
       console.error('Failed to fetch repositories', error);
     }
