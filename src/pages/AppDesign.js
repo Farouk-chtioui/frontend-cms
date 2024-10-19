@@ -80,6 +80,13 @@ const AppDesign = () => {
 
   const handleHexInputChange = (e, key) => {
     const value = e.target.value;
+    // Allow typing partial hex codes (e.g., '#FFF') and real-time color change
+    setColors((prevColors) => ({
+      ...prevColors,
+      [key]: value,
+    }));
+  
+    // Validate full hex color after typing is complete
     if (/^#[0-9A-F]{6}$/i.test(value)) {
       setColors((prevColors) => ({
         ...prevColors,
@@ -87,6 +94,7 @@ const AppDesign = () => {
       }));
     }
   };
+  
 
   const handleClickAway = (key) => {
     setShowColorPicker((prevState) => ({
@@ -131,18 +139,18 @@ const AppDesign = () => {
               onClick={() => toggleColorPicker(item.key)}
             />
             <TextField
-              label={item.label}
-              value={colors[item.key]}
-              size="small"
-              onChange={(e) => handleHexInputChange(e, item.key)} // Handle manual hex input
-              onClick={() => toggleColorPicker(item.key)}
-              sx={{
-                maxWidth: 200,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                },
-              }}
-            />
+            label={item.label}
+            value={colors[item.key]}
+            size="small"
+            onChange={(e) => handleHexInputChange(e, item.key)}  // Handle manual hex input
+            sx={{
+              maxWidth: 200,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+              },
+            }}
+          />
+
           </Box>
           {showColorPicker[item.key] && (
             <ClickAwayListener onClickAway={() => handleClickAway(item.key)}>
