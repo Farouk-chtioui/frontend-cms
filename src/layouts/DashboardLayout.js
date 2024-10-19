@@ -28,15 +28,16 @@ const DashboardLayout = ({ children }) => {
 
         {/* Main content area */}
         <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            padding: 3,
-            backgroundColor: '#f5f5f5', 
-            overflow: 'auto',            
-            marginTop: '60px',           
-          }}
-        >
+        component="main"
+        sx={{
+          flexGrow: 1,
+          padding: 3,
+          backgroundColor: '#f5f5f5',
+          overflow: 'auto',
+          marginTop: '100px',  // Adjust to the new Topbar height
+        }}
+      >
+
           <Grid container spacing={3}>
             {children}  
           </Grid>

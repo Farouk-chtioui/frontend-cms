@@ -99,7 +99,7 @@ const Topbar = () => {
           ml: "240px", 
         }}
       >
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between", height: '84px' }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               onClick={handleMenuClick}
