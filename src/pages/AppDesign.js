@@ -174,7 +174,7 @@ const AppDesign = () => {
   };
 
   return (
-    <Box sx={{ padding: 2 }}>
+    <Box sx={{ padding: 2, marginTop: 10 }}>
       <Typography variant="h4" gutterBottom>
         App Design
       </Typography>
