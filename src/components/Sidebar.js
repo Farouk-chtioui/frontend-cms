@@ -52,7 +52,7 @@ const Sidebar = () => {
     >
       <div style={{ padding: '16px', textAlign: 'center', fontWeight: 'bold' }}>
         {/* Logo will be added here later */}
-        <Typography variant="h5" sx={{ fontFamily: 'Roboto, sans-serif', color: '#424242' }}>Leap</Typography>
+        <Typography variant="h5" sx={{ fontFamily: 'Roboto, sans-serif', color: '#424242' }}>temp</Typography>
         <Typography variant="body2" sx={{ fontFamily: 'Roboto, sans-serif', color: '#757575' }}>Mobile Apps</Typography>
       </div>
       <Divider />
