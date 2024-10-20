@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';  
 import Login from './pages/Login';
 import AppDesign from './pages/AppDesign';
+import AppLayout from './pages/AppLayout';  // Import AppLayout
 import authService from './services/authService';
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/app-design" element={isAuthenticated ? <AppDesign /> : <Navigate to="/login" />} />
+            <Route path="/app-layout" element={isAuthenticated ? <AppLayout /> : <Navigate to="/login" />} /> 
           </Routes>
         </div>
       </div>
