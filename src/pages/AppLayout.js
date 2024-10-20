@@ -15,15 +15,16 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import * as Icons from '@mui/icons-material';
+import { DeviceFrameset } from 'react-device-frameset'; 
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import * as Icons from '@mui/icons-material';
-
-// Modal component for selecting icons and modifying tab name
+import 'react-device-frameset/styles/marvel-devices.min.css'
+import 'react-device-frameset/styles/device-selector.min.css'
 const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   const [tabName, setTabName] = useState(tabData?.name || '');
   const [selectedIcon, setSelectedIcon] = useState(tabData?.iconName || '');
@@ -31,7 +32,6 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Dynamically load all icons from @mui/icons-material
     const icons = Object.keys(Icons).map((iconName) => ({
       name: iconName,
       component: Icons[iconName],
@@ -107,8 +107,11 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
             </Box>
           ))}
         </Box>
-        <Box sx={{ mt: 2 }}>
-          <Button variant="contained" onClick={handleSave}>
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+          <Button variant="contained" color="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleSave}>
             Save
           </Button>
         </Box>
@@ -117,7 +120,7 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   );
 };
 
-// Drag-and-drop tab component
+// Draggable tab component
 const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete, onToggleVisibility, onSetHomeScreen }) => {
   const [, ref] = useDrag({
     type: 'TAB',
@@ -186,11 +189,11 @@ const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete, onToggleVisibilit
 const AppLayout = () => {
   const [activeTab, setActiveTab] = useState('appScreens');
   const [bottomBarTabs, setBottomBarTabs] = useState([
-    { name: 'Accueil', icon: <Icons.Home />, iconName: 'Home', visible: true, isHome: false },
-    { name: 'Offres', icon: <Icons.LocalOffer />, iconName: 'LocalOffer', visible: true, isHome: false },
-    { name: 'Mon Compte', icon: <Icons.AccountCircle />, iconName: 'AccountCircle', visible: true, isHome: false },
-    { name: 'Panier', icon: <Icons.ShoppingCart />, iconName: 'ShoppingCart', visible: true, isHome: false },
-    { name: 'Infos', icon: <Icons.Info />, iconName: 'Info', visible: true, isHome: false },
+    { name: 'Home', icon: <Icons.Home />, iconName: 'Home', visible: true, isHome: false },
+    { name: 'Offers', icon: <Icons.LocalOffer />, iconName: 'LocalOffer', visible: true, isHome: false },
+    { name: 'Account', icon: <Icons.AccountCircle />, iconName: 'AccountCircle', visible: true, isHome: false },
+    { name: 'Cart', icon: <Icons.ShoppingCart />, iconName: 'ShoppingCart', visible: true, isHome: false },
+    { name: 'Info', icon: <Icons.Info />, iconName: 'Info', visible: true, isHome: false },
   ]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTabIndex, setEditingTabIndex] = useState(null);
@@ -274,17 +277,15 @@ const AppLayout = () => {
         <Tab label="Onboarding" value="onboarding" />
       </Tabs>
 
-      {/* Bottom Bar Tab */}
       {activeTab === 'bottomBar' && (
         <DndProvider backend={HTML5Backend}>
-          <Box sx={{ display: 'flex' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6" gutterBottom>
                 Customize Bottom Bar
               </Typography>
 
-              {/* Bottom Bar Tabs List */}
-              <Grid container spacing={2} direction={window.innerWidth <= 600 ? 'row' : 'column'}>
+              <Grid container spacing={2}>
                 {bottomBarTabs.map((tab, index) => (
                   <DraggableTab
                     key={index}
@@ -314,55 +315,58 @@ const AppLayout = () => {
               )}
             </Box>
 
-            {/* Dynamic Mobile Screen Preview */}
             <Box sx={{ marginLeft: 4, textAlign: 'center', flex: 1 }}>
               <Typography variant="h6" gutterBottom>
                 Live Preview
               </Typography>
-              <Paper
-                sx={{
-                  width: '300px',
-                  height: '600px',
-                  backgroundColor: '#ffffff',
-                  margin: '0 auto',
-                  boxShadow: 3,
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                }}
+              <DeviceFrameset
+                device="iPhone X" // Correct deviceType prop
+                color="black"
               >
-                <Box
+                <Paper
                   sx={{
-                    height: '90%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#ffffff',
+                    margin: '0 auto',
+                    boxShadow: 3,
+                    borderRadius: '16px',
+                    overflow: 'hidden',
                   }}
                 >
-                  <Typography variant="h5">Your App Content Here</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    height: '10%',
-                    display: 'flex',
-                    justifyContent: 'space-around',
-                    alignItems: 'center',
-                    backgroundColor: '#f1f1f1',
-                  }}
-                >
-                  {bottomBarTabs.filter(tab => tab.visible).map((tab) => (
-                    <Box key={tab.iconName} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      {tab.icon}
-                      <Typography variant="caption">{tab.name}</Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Paper>
+                  <Box
+                    sx={{
+                      height: '90%',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Typography variant="h5">Your App Content Here</Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      height: '10%',
+                      display: 'flex',
+                      justifyContent: 'space-around',
+                      alignItems: 'center',
+                      backgroundColor: '#f1f1f1',
+                    }}
+                  >
+                    {bottomBarTabs.filter(tab => tab.visible).map((tab) => (
+                      <Box key={tab.iconName} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        {tab.icon}
+                        <Typography variant="caption">{tab.name}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Paper>
+              </DeviceFrameset>
             </Box>
           </Box>
         </DndProvider>
       )}
 
-      {/* Modal for Editing Tab */}
       <TabEditorModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
