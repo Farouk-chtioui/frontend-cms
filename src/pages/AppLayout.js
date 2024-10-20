@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   Menu,
   MenuItem,
+  InputAdornment,
 } from '@mui/material';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -23,13 +24,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import 'react-device-frameset/styles/marvel-devices.min.css'
 import 'react-device-frameset/styles/device-selector.min.css'
+
 const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   const [tabName, setTabName] = useState(tabData?.name || '');
   const [selectedIcon, setSelectedIcon] = useState(tabData?.iconName || '');
   const [iconOptions, setIconOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [uploadedImage, setUploadedImage] = useState(null);
 
   useEffect(() => {
     const icons = Object.keys(Icons).map((iconName) => ({
@@ -40,8 +44,20 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   }, []);
 
   const handleSave = () => {
-    onSave({ name: tabName, iconName: selectedIcon });
+    onSave({ name: tabName, iconName: selectedIcon, uploadedImage });
     onClose();
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target.result);
+        setSelectedIcon('uploadedImage');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const filteredIcons = iconOptions.filter((icon) =>
@@ -80,6 +96,29 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
           fullWidth
           sx={{ marginBottom: 2 }}
         />
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+          <Button
+            variant="contained"
+            component="label"
+            startIcon={<PhotoCamera />}
+            sx={{ marginRight: 2 }}
+          >
+            Upload Icon
+            <input
+              type="file"
+              accept="image/png"
+              hidden
+              onChange={handleImageUpload}
+            />
+          </Button>
+          {uploadedImage && (
+            <img
+              src={uploadedImage}
+              alt="Uploaded Icon"
+              style={{ width: 40, height: 40, borderRadius: 4 }}
+            />
+          )}
+        </Box>
         <Box
           sx={{
             maxHeight: 200,
@@ -106,6 +145,22 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
               {React.createElement(icon.component)}
             </Box>
           ))}
+          {uploadedImage && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: 1,
+                border: selectedIcon === 'uploadedImage' ? '2px solid blue' : '1px solid gray',
+                borderRadius: 1,
+              }}
+              onClick={() => setSelectedIcon('uploadedImage')}
+            >
+              <img src={uploadedImage} alt="Uploaded Icon" style={{ width: '100%' }} />
+            </Box>
+          )}
         </Box>
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
           <Button variant="contained" color="secondary" onClick={onClose}>
@@ -229,7 +284,13 @@ const AppLayout = () => {
   };
 
   const handleSaveTab = (tabData) => {
-    const iconComponent = tabData.iconName ? React.createElement(Icons[tabData.iconName]) : bottomBarTabs[editingTabIndex].icon;
+    let iconComponent;
+    if (tabData.iconName === 'uploadedImage' && tabData.uploadedImage) {
+      iconComponent = <img src={tabData.uploadedImage} alt="Custom Icon" style={{ width: '24px', height: '24px' }} />;
+    } else {
+      iconComponent = tabData.iconName ? React.createElement(Icons[tabData.iconName]) : bottomBarTabs[editingTabIndex].icon;
+    }
+
     if (editingTabIndex !== null) {
       const updatedTabs = [...bottomBarTabs];
       updatedTabs[editingTabIndex] = {
