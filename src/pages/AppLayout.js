@@ -1,49 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Box,
   Typography,
   Tabs,
   Tab,
-  Grid2,
+  Grid,
   Paper,
   IconButton,
   Modal,
-  MenuItem,
-  Select,
   TextField,
+  Switch,
+  FormControlLabel,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-
-// Sample icons for Bottom Bar
-import HomeIcon from '@mui/icons-material/Home';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import InfoIcon from '@mui/icons-material/Info';
-
-// Available icons for tab selection
-const iconOptions = {
-  Home: <HomeIcon />,
-  Offers: <LocalOfferIcon />,
-  Account: <AccountCircleIcon />,
-  Cart: <ShoppingCartIcon />,
-  Info: <InfoIcon />,
-};
+import * as Icons from '@mui/icons-material';
 
 // Modal component for selecting icons and modifying tab name
 const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   const [tabName, setTabName] = useState(tabData?.name || '');
   const [selectedIcon, setSelectedIcon] = useState(tabData?.iconName || '');
+  const [iconOptions, setIconOptions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    // Dynamically load all icons from @mui/icons-material
+    const icons = Object.keys(Icons).map((iconName) => ({
+      name: iconName,
+      component: Icons[iconName],
+    }));
+    setIconOptions(icons);
+  }, []);
 
   const handleSave = () => {
     onSave({ name: tabName, iconName: selectedIcon });
     onClose();
   };
+
+  const filteredIcons = iconOptions.filter((icon) =>
+    icon.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -70,17 +73,40 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
           fullWidth
           sx={{ marginBottom: 2 }}
         />
-        <Select
-          value={selectedIcon}
-          onChange={(e) => setSelectedIcon(e.target.value)}
+        <TextField
+          label="Search Icons"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           fullWidth
+          sx={{ marginBottom: 2 }}
+        />
+        <Box
+          sx={{
+            maxHeight: 200,
+            overflowY: 'auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(50px, 1fr))',
+            gap: 1,
+          }}
         >
-          {Object.keys(iconOptions).map((iconName) => (
-            <MenuItem key={iconName} value={iconName}>
-              {iconName}
-            </MenuItem>
+          {filteredIcons.map((icon) => (
+            <Box
+              key={icon.name}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+                padding: 1,
+                border: selectedIcon === icon.name ? '2px solid blue' : '1px solid gray',
+                borderRadius: 1,
+              }}
+              onClick={() => setSelectedIcon(icon.name)}
+            >
+              {React.createElement(icon.component)}
+            </Box>
           ))}
-        </Select>
+        </Box>
         <Box sx={{ mt: 2 }}>
           <Button variant="contained" onClick={handleSave}>
             Save
@@ -92,7 +118,7 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
 };
 
 // Drag-and-drop tab component
-const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete }) => {
+const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete, onToggleVisibility, onSetHomeScreen }) => {
   const [, ref] = useDrag({
     type: 'TAB',
     item: { index },
@@ -108,8 +134,18 @@ const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete }) => {
     },
   });
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <Grid2 ref={(node) => ref(drop(node))} item xs={12}>
+    <Grid ref={(node) => ref(drop(node))} item xs={12}>
       <Paper
         sx={{
           padding: 2,
@@ -123,26 +159,38 @@ const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete }) => {
           <Typography sx={{ marginLeft: 2 }}>{tab.name}</Typography>
         </Box>
         <Box>
+          <FormControlLabel
+            control={<Switch checked={tab.visible} onChange={() => onToggleVisibility(index)} />}
+            label="Visible"
+          />
+          <IconButton onClick={handleMenuOpen}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={() => { onSetHomeScreen(index); handleMenuClose(); }}>Set as Home</MenuItem>
+            <MenuItem onClick={() => { onDelete(index); handleMenuClose(); }}>Delete</MenuItem>
+          </Menu>
           <IconButton color="primary" onClick={onEdit}>
             <EditIcon />
           </IconButton>
-          <IconButton color="error" onClick={onDelete}>
-            <DeleteIcon />
-          </IconButton>
         </Box>
       </Paper>
-    </Grid2>
+    </Grid>
   );
 };
 
 const AppLayout = () => {
   const [activeTab, setActiveTab] = useState('appScreens');
   const [bottomBarTabs, setBottomBarTabs] = useState([
-    { name: 'Accueil', icon: <HomeIcon />, iconName: 'Home' },
-    { name: 'Offres', icon: <LocalOfferIcon />, iconName: 'Offers' },
-    { name: 'Mon Compte', icon: <AccountCircleIcon />, iconName: 'Account' },
-    { name: 'Panier', icon: <ShoppingCartIcon />, iconName: 'Cart' },
-    { name: 'Infos', icon: <InfoIcon />, iconName: 'Info' },
+    { name: 'Accueil', icon: <Icons.Home />, iconName: 'Home', visible: true, isHome: false },
+    { name: 'Offres', icon: <Icons.LocalOffer />, iconName: 'LocalOffer', visible: true, isHome: false },
+    { name: 'Mon Compte', icon: <Icons.AccountCircle />, iconName: 'AccountCircle', visible: true, isHome: false },
+    { name: 'Panier', icon: <Icons.ShoppingCart />, iconName: 'ShoppingCart', visible: true, isHome: false },
+    { name: 'Infos', icon: <Icons.Info />, iconName: 'Info', visible: true, isHome: false },
   ]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTabIndex, setEditingTabIndex] = useState(null);
@@ -159,6 +207,10 @@ const AppLayout = () => {
   };
 
   const handleAddTab = () => {
+    if (bottomBarTabs.length >= 5) {
+      alert('Maximum number of tabs (5) reached.');
+      return;
+    }
     setModalOpen(true);
     setEditingTabIndex(null);
   };
@@ -174,20 +226,36 @@ const AppLayout = () => {
   };
 
   const handleSaveTab = (tabData) => {
+    const iconComponent = tabData.iconName ? React.createElement(Icons[tabData.iconName]) : bottomBarTabs[editingTabIndex].icon;
     if (editingTabIndex !== null) {
       const updatedTabs = [...bottomBarTabs];
       updatedTabs[editingTabIndex] = {
+        ...updatedTabs[editingTabIndex],
         name: tabData.name,
-        icon: iconOptions[tabData.iconName],
-        iconName: tabData.iconName,
+        icon: iconComponent,
+        iconName: tabData.iconName || updatedTabs[editingTabIndex].iconName,
       };
       setBottomBarTabs(updatedTabs);
     } else {
       setBottomBarTabs((prevTabs) => [
         ...prevTabs,
-        { name: tabData.name, icon: iconOptions[tabData.iconName], iconName: tabData.iconName },
+        { name: tabData.name, icon: iconComponent, iconName: tabData.iconName, visible: true, isHome: false },
       ]);
     }
+  };
+
+  const handleToggleVisibility = (index) => {
+    const updatedTabs = [...bottomBarTabs];
+    updatedTabs[index].visible = !updatedTabs[index].visible;
+    setBottomBarTabs(updatedTabs);
+  };
+
+  const handleSetHomeScreen = (index) => {
+    const updatedTabs = bottomBarTabs.map((tab, i) => ({
+      ...tab,
+      isHome: i === index,
+    }));
+    setBottomBarTabs(updatedTabs);
   };
 
   return (
@@ -209,36 +277,45 @@ const AppLayout = () => {
       {/* Bottom Bar Tab */}
       {activeTab === 'bottomBar' && (
         <DndProvider backend={HTML5Backend}>
-          <Box>
-            <Typography variant="h6" gutterBottom>
-              Customize Bottom Bar
-            </Typography>
+          <Box sx={{ display: 'flex' }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" gutterBottom>
+                Customize Bottom Bar
+              </Typography>
 
-            {/* Bottom Bar Tabs List */}
-            <Grid2 container spacing={2}>
-              {bottomBarTabs.map((tab, index) => (
-                <DraggableTab
-                  key={index}
-                  tab={tab}
-                  index={index}
-                  moveTab={moveTab}
-                  onEdit={() => handleEditTab(index)}
-                  onDelete={() => handleDeleteTab(index)}
-                />
-              ))}
-            </Grid2>
+              {/* Bottom Bar Tabs List */}
+              <Grid container spacing={2} direction={window.innerWidth <= 600 ? 'row' : 'column'}>
+                {bottomBarTabs.map((tab, index) => (
+                  <DraggableTab
+                    key={index}
+                    tab={tab}
+                    index={index}
+                    moveTab={moveTab}
+                    onEdit={() => handleEditTab(index)}
+                    onDelete={() => handleDeleteTab(index)}
+                    onToggleVisibility={handleToggleVisibility}
+                    onSetHomeScreen={handleSetHomeScreen}
+                  />
+                ))}
+              </Grid>
 
-            <Button
-              variant="contained"
-              onClick={handleAddTab}
-              startIcon={<AddIcon />}
-              sx={{ marginTop: 2 }}
-            >
-              Add Tab
-            </Button>
+              <Button
+                variant="contained"
+                onClick={handleAddTab}
+                startIcon={<AddIcon />}
+                sx={{ marginTop: 2 }}
+              >
+                Add Tab
+              </Button>
+              {bottomBarTabs.length >= 5 && (
+                <Typography color="error" sx={{ marginTop: 2 }}>
+                  Maximum number of tabs (5) reached.
+                </Typography>
+              )}
+            </Box>
 
             {/* Dynamic Mobile Screen Preview */}
-            <Box sx={{ marginTop: 4, textAlign: 'center' }}>
+            <Box sx={{ marginLeft: 4, textAlign: 'center', flex: 1 }}>
               <Typography variant="h6" gutterBottom>
                 Live Preview
               </Typography>
@@ -261,21 +338,19 @@ const AppLayout = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <Typography variant="h5" color="textSecondary">
-                    App Content Area
-                  </Typography>
+                  <Typography variant="h5">Your App Content Here</Typography>
                 </Box>
                 <Box
                   sx={{
+                    height: '10%',
                     display: 'flex',
-                    justifyContent: 'space-evenly',
-                    backgroundColor: '#f5f5f5',
-                    padding: '10px',
-                    borderTop: '1px solid #ddd',
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                    backgroundColor: '#f1f1f1',
                   }}
                 >
-                  {bottomBarTabs.map((tab, index) => (
-                    <Box key={index} textAlign="center">
+                  {bottomBarTabs.filter(tab => tab.visible).map((tab) => (
+                    <Box key={tab.iconName} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       {tab.icon}
                       <Typography variant="caption">{tab.name}</Typography>
                     </Box>
@@ -287,7 +362,7 @@ const AppLayout = () => {
         </DndProvider>
       )}
 
-      {/* Modal for Editing or Adding Tabs */}
+      {/* Modal for Editing Tab */}
       <TabEditorModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
