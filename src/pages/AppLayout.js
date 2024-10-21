@@ -219,7 +219,6 @@ const DraggableTab = ({ tab, index, moveTab, onEdit, onDelete, onToggleVisibilit
         <Box>
           <FormControlLabel
             control={<Switch checked={tab.visible} onChange={() => onToggleVisibility(index)} />}
-            label="Visible"
           />
           <IconButton onClick={handleMenuOpen}>
             <MoreVertIcon />
