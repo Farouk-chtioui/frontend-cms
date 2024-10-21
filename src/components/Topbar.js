@@ -17,12 +17,14 @@ import {
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import repositoryService from "../services/repositoryService";
 import { useRepo } from '../context/RepoContext';
 
 const Topbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [projects, setProjects] = useState([]);
@@ -45,9 +47,7 @@ const Topbar = () => {
 
       setProjects(fetchedRepos);
 
-      // Check if selectedRepo exists in the list
       if (selectedRepo && !fetchedRepos.find(repo => repo.repositoryName === selectedRepo.repositoryName)) {
-        // If selectedRepo doesn't exist in the list, select the first one
         updateSelectedRepo(fetchedRepos[0]);
       }
     } catch (error) {
@@ -68,6 +68,14 @@ const Topbar = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setIsOpen(false);
+  };
+
+  const handleProfileMenuClick = (event) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileAnchorEl(null);
   };
 
   const handleCreateRepository = async () => {
@@ -160,10 +168,9 @@ const Topbar = () => {
                 </MenuItem>
               ))}
 
-              {/* Add New Repository */}
               <MenuItem
                 onClick={() => {
-                  setShowCreateDialog(true); // Open the create repo dialog
+                  setShowCreateDialog(true);
                   handleMenuClose();
                 }}
               >
@@ -191,15 +198,32 @@ const Topbar = () => {
             )}
           </Box>
 
-          <Box>
-            <Typography variant="h6" sx={{ color: "#424242", fontFamily: "Roboto, sans-serif" }}>
-              Welcome, {localStorage.getItem('username')}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="h6" sx={{ color: "#424242", fontFamily: "Roboto, sans-serif", mr: 2 }}>
+              Last published {selectedRepo?.publishDate} by {localStorage.getItem('username')}
             </Typography>
+            <Button variant="contained" color="primary" sx={{ mr: 2 }}>
+              Publish
+            </Button>
+            <IconButton onClick={handleProfileMenuClick}>
+              <AccountCircleIcon sx={{ color: "#424242" }} />
+            </IconButton>
+            <Typography variant="h6" sx={{ color: "#424242", fontFamily: "Roboto, sans-serif", ml: 1 }}>
+              {localStorage.getItem('username')}
+            </Typography>
+            <Menu
+              anchorEl={profileAnchorEl}
+              open={Boolean(profileAnchorEl)}
+              onClose={handleProfileMenuClose}
+            >
+              <MenuItem onClick={handleProfileMenuClose}>Settings</MenuItem>
+              <MenuItem onClick={handleProfileMenuClose}>Support</MenuItem>
+              <MenuItem onClick={handleProfileMenuClose}>Sign Out</MenuItem>
+            </Menu>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Create Repository Dialog */}
       <Dialog
         open={showCreateDialog}
         onClose={() => setShowCreateDialog(false)}
