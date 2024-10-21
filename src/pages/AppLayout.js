@@ -34,14 +34,31 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
   const [iconOptions, setIconOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [iconStyle, setIconStyle] = useState('regular');
 
   useEffect(() => {
-    const icons = Object.keys(Icons).map((iconName) => ({
-      name: iconName,
-      component: Icons[iconName],
-    }));
+    let icons;
+    switch (iconStyle) {
+      case 'outlined':
+        icons = Object.keys(Icons).filter(iconName => iconName.endsWith('Outlined')).map((iconName) => ({
+          name: iconName,
+          component: Icons[iconName],
+        }));
+        break;
+      case 'sharp':
+        icons = Object.keys(Icons).filter(iconName => iconName.endsWith('Sharp')).map((iconName) => ({
+          name: iconName,
+          component: Icons[iconName],
+        }));
+        break;
+      default:
+        icons = Object.keys(Icons).filter(iconName => !iconName.endsWith('Outlined') && !iconName.endsWith('Sharp')).map((iconName) => ({
+          name: iconName,
+          component: Icons[iconName],
+        }));
+    }
     setIconOptions(icons);
-  }, []);
+  }, [iconStyle]);
 
   const handleSave = () => {
     onSave({ name: tabName, iconName: selectedIcon, uploadedImage });
@@ -96,6 +113,17 @@ const TabEditorModal = ({ open, onClose, onSave, tabData }) => {
           fullWidth
           sx={{ marginBottom: 2 }}
         />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+          <Button variant={iconStyle === 'regular' ? 'contained' : 'outlined'} onClick={() => setIconStyle('regular')}>
+            Regular
+          </Button>
+          <Button variant={iconStyle === 'outlined' ? 'contained' : 'outlined'} onClick={() => setIconStyle('outlined')}>
+            Outlined
+          </Button>
+          <Button variant={iconStyle === 'sharp' ? 'contained' : 'outlined'} onClick={() => setIconStyle('sharp')}>
+            Sharp
+          </Button>
+        </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
           <Button
             variant="contained"
