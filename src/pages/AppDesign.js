@@ -38,27 +38,24 @@ const AppDesign = () => {
   const [showColorPicker, setShowColorPicker] = useState({});
   const { selectedRepo } = useRepo();
 
-  useEffect(() => {
-    const fetchExistingDesign = async () => {
-      if (!selectedRepo) {
-        return;
-      }
-
-      try {
-        const response = await mobileAppService.findByRepoId(selectedRepo._id);
-        if (response.data && response.data.appDesignId) {
-          setColors(response.data.appDesignId); // Assuming the response contains appDesignId with design data
-        } else {
-          setColors(initialColors);
+    useEffect(() => {
+      const fetchExistingDesign = async () => {
+        if (!selectedRepo) {
+          return;
         }
-      } catch (error) {
-        console.error('Error fetching existing design:', error);
-        setColors(initialColors);
-      }
-    };
-
-    fetchExistingDesign();
-  }, [selectedRepo]);
+  
+        try {
+          const response = await mobileAppService.findMobileAppByRepositoryId(selectedRepo._id);
+          if (response.data && response.data.appDesignId) {
+            setColors(response.data.appDesignId);
+          }
+        } catch (error) {
+          console.error('Error fetching existing design:', error);
+        }
+      };
+  
+      fetchExistingDesign();
+    }, [selectedRepo, setColors]);
 
   const handleThemeChange = (event, newValue) => {
     setTheme(newValue);
@@ -116,6 +113,8 @@ const AppDesign = () => {
     try {
       const response = await mobileAppService.updateMobileAppDesignByRepoId(selectedRepo._id, colors);
       console.log('Theme settings saved:', response.data);
+      alert('App design updated successfully');
+
     } catch (error) {
       console.error('Error saving theme settings:', error);
     }
