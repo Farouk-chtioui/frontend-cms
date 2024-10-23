@@ -4,12 +4,10 @@ const RepoContext = createContext();
 
 export const RepoProvider = ({ children }) => {
   const [selectedRepo, setSelectedRepo] = useState(() => {
-    // Get the stored selected repository and userId
     const savedRepo = localStorage.getItem('selectedRepo');
     const savedUserId = localStorage.getItem('savedUserId');
     const currentUserId = localStorage.getItem('userId'); // This is the current logged-in user
 
-    // If the stored userId doesn't match the current one, clear the selectedRepo
     if (savedUserId !== currentUserId) {
       localStorage.removeItem('selectedRepo');
       return null;
@@ -20,7 +18,7 @@ export const RepoProvider = ({ children }) => {
   const updateSelectedRepo = (repo) => {
     setSelectedRepo(repo);
     localStorage.setItem('selectedRepo', JSON.stringify(repo));
-    localStorage.setItem('savedUserId', localStorage.getItem('userId')); // Store userId when repo is selected
+    localStorage.setItem('savedUserId', localStorage.getItem('userId')); 
   };
 
   return (
