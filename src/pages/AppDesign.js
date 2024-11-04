@@ -38,24 +38,28 @@ const AppDesign = () => {
   const [showColorPicker, setShowColorPicker] = useState({});
   const { selectedRepo } = useRepo();
 
-    useEffect(() => {
-      const fetchExistingDesign = async () => {
-        if (!selectedRepo) {
-          return;
-        }
+  useEffect(() => {
+    const fetchExistingDesign = async () => {
+      if (!selectedRepo) {
+        console.error('No repository selected');
+        return;
+      }
+      console.log('Selected Repository ID:', selectedRepo._id); // Debugging log
   
-        try {
-          const response = await mobileAppService.findMobileAppByRepositoryId(selectedRepo._id);
-          if (response.data && response.data.appDesignId) {
-            setColors(response.data.appDesignId);
-          }
-        } catch (error) {
-          console.error('Error fetching existing design:', error);
+      try {
+        const response = await mobileAppService.findMobileAppByRepositoryId(selectedRepo._id);
+        if (response.data && response.data.appDesignId) {
+          setColors(response.data.appDesignId);
         }
-      };
+      } catch (error) {
+        console.error('Error fetching existing design:', error);
+      }
+    };
   
-      fetchExistingDesign();
-    }, [selectedRepo, setColors]);
+    fetchExistingDesign();
+  }, [selectedRepo, setColors]);
+  
+  
 
   const handleThemeChange = (event, newValue) => {
     setTheme(newValue);
