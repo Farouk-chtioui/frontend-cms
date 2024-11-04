@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate(); 
@@ -13,7 +13,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await authService.login({ username, password });
+      await authService.login({ email, password });
       localStorage.removeItem('selectedRepo'); 
       navigate('/dashboard');
     } catch (err) {
@@ -31,11 +31,11 @@ const Login = () => {
           {error && <Typography color="error">{error}</Typography>}
           <form onSubmit={handleLogin}>
             <TextField
-              label="Username"
+              label="Email"
               fullWidth
               margin="normal"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <TextField
               label="Password"

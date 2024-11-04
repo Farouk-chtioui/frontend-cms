@@ -7,8 +7,8 @@ const login = async (credentials) => {
   try {
     const response = await axios.post(`${API_URL}/login`, credentials);
     
-    const { access_token, userId, username } = response.data;
-    localStorage.setItem('username', username);
+    const { access_token, userId, email } = response.data;
+    localStorage.setItem('email', email);
     localStorage.setItem('token', access_token);
     localStorage.setItem('userId', userId);
   } catch (error) {
@@ -20,7 +20,7 @@ const login = async (credentials) => {
 
 const logout = () => {
   localStorage.removeItem('token');
-  localStorage.removeItem('username');
+  localStorage.removeItem('email');
   localStorage.removeItem('userId');
   localStorage.removeItem('selectedRepo');
 };
