@@ -149,7 +149,7 @@ const Topbar = () => {
         ownerId: selectedMobileApp.ownerId,
       });
   
-      if (response.data && response.data.downloadUrl) {
+      if (response.data) {
         alert(`App generated! Download from: ${response.data.downloadUrl}`);
       } else {
         alert("App generation failed.");
