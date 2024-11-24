@@ -1,31 +1,33 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// Create context
 const RepoContext = createContext();
 
 export const RepoProvider = ({ children }) => {
+  // Try to retrieve the initial state from localStorage
+  const initialState = localStorage.getItem("selectedRepo");
   const [selectedRepo, setSelectedRepo] = useState(() => {
-    const savedRepo = localStorage.getItem('selectedRepo');
-    const savedUserId = localStorage.getItem('savedUserId');
-    const currentUserId = localStorage.getItem('userId'); // This is the current logged-in user
-
-    if (savedUserId !== currentUserId) {
-      localStorage.removeItem('selectedRepo');
-      return null;
+    try {
+      return initialState ? JSON.parse(initialState) : {}; // Provide a default value
+    } catch (error) {
+      console.error("Failed to parse selectedRepo from localStorage:", error);
+      return {}; // Fallback in case of error
     }
-    return savedRepo ? JSON.parse(savedRepo) : null;
   });
 
-  const updateSelectedRepo = (repo) => {
-    setSelectedRepo(repo);
-    localStorage.setItem('selectedRepo', JSON.stringify(repo));
-    localStorage.setItem('savedUserId', localStorage.getItem('userId')); 
-  };
+  useEffect(() => {
+    // Update localStorage whenever selectedRepo changes
+    localStorage.setItem("selectedRepo", JSON.stringify(selectedRepo));
+  }, [selectedRepo]);
 
   return (
-    <RepoContext.Provider value={{ selectedRepo, updateSelectedRepo }}>
+    <RepoContext.Provider value={{ selectedRepo, setSelectedRepo }}>
       {children}
     </RepoContext.Provider>
   );
 };
 
-export const useRepo = () => useContext(RepoContext);
+// Custom hook to use the RepoContext
+export const useRepo = () => {
+  return useContext(RepoContext);
+};
