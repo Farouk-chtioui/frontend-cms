@@ -1,43 +1,61 @@
-import React, { useState } from 'react';
-import { Box, Typography, Tabs, Tab } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Tabs, Tab, Button } from '@mui/material';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import * as Icons from '@mui/icons-material'; // Add this import
+import axios from 'axios';
+import * as Icons from '@mui/icons-material';
 import TabEditorModal from '../components/TabEditorModal';
 import BottomBar from '../components/BottomBar';
 import LivePreview from '../components/LivePreview';
 
 const AppLayout = () => {
-  const [activeTab, setActiveTab] = useState('appScreens');
-  const [bottomBarTabs, setBottomBarTabs] = useState([
-    { name: 'Home', icon: <Icons.Home />, iconName: 'Home', visible: true, isHome: false },
-    { name: 'Offers', icon: <Icons.LocalOffer />, iconName: 'LocalOffer', visible: true, isHome: false },
-    { name: 'Account', icon: <Icons.AccountCircle />, iconName: 'AccountCircle', visible: true, isHome: false },
-    { name: 'Cart', icon: <Icons.ShoppingCart />, iconName: 'ShoppingCart', visible: true, isHome: false },
-    { name: 'Info', icon: <Icons.Info />, iconName: 'Info', visible: true, isHome: false },
-  ]);
+  const [activeTab, setActiveTab] = useState('bottomBar');
+  const [bottomBarTabs, setBottomBarTabs] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTabIndex, setEditingTabIndex] = useState(null);
 
+  // Fetch layout on component mount
+  useEffect(() => {
+    const fetchLayout = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/app-layout/default');
+        if (response.data?.bottomBarTabs) {
+          const updatedTabs = response.data.bottomBarTabs.map((tab) => ({
+            ...tab,
+            icon: Icons[tab.iconName]
+              ? React.createElement(Icons[tab.iconName])
+              : React.createElement(Icons.HelpOutline), // Fallback icon
+          }));
+          setBottomBarTabs(updatedTabs);
+        } else {
+          console.error('No default layout found.');
+        }
+      } catch (error) {
+        console.error('Error fetching default layout:', error);
+      }
+    };
+
+    fetchLayout();
+  }, []);
+
+  // Handle tab change
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
+  // Save tab handler
   const handleSaveTab = (tabData) => {
-    let iconComponent;
-    if (tabData.iconName === 'uploadedImage' && tabData.uploadedImage) {
-      iconComponent = <img src={tabData.uploadedImage} alt="Custom Icon" style={{ width: '24px', height: '24px' }} />;
-    } else {
-      iconComponent = tabData.iconName ? React.createElement(Icons[tabData.iconName]) : bottomBarTabs[editingTabIndex].icon;
-    }
-
+    const iconComponent = Icons[tabData.iconName]
+      ? React.createElement(Icons[tabData.iconName])
+      : React.createElement(Icons.HelpOutline); // Fallback icon
+  
     if (editingTabIndex !== null) {
       const updatedTabs = [...bottomBarTabs];
       updatedTabs[editingTabIndex] = {
         ...updatedTabs[editingTabIndex],
         name: tabData.name,
         icon: iconComponent,
-        iconName: tabData.iconName || updatedTabs[editingTabIndex].iconName,
+        iconName: tabData.iconName,
       };
       setBottomBarTabs(updatedTabs);
     } else {
@@ -47,6 +65,62 @@ const AppLayout = () => {
       ]);
     }
   };
+  
+
+  // Save changes handler
+  const handleSaveChanges = async () => {
+    try {
+      // Construct the payload without layoutType
+      const payload = {
+        bottomBarTabs: bottomBarTabs.map((tab) => ({
+          name: tab.name,
+          iconName: tab.iconName,
+          visible: tab.visible,
+          isHome: tab.isHome,
+        })),
+      };
+  
+      console.log('Payload being sent:', payload); // Debug payload structure
+  
+      const response = await axios.put('http://localhost:3001/app-layout/update', payload);
+  
+      if (response.status === 200) {
+        alert('Layout updated successfully!');
+      } else {
+        throw new Error('Failed to update layout.');
+      }
+    } catch (error) {
+      console.error('Error updating layout:', error.response?.data || error.message);
+      alert('Failed to update layout.');
+    }
+  };
+  
+  
+  
+  
+
+  // Reset layout to default handler
+  const handleResetToDefault = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/app-layout/reset');
+      if (response.data?.bottomBarTabs) {
+        const updatedTabs = response.data.bottomBarTabs.map((tab) => ({
+          ...tab,
+          icon: Icons[tab.iconName]
+            ? React.createElement(Icons[tab.iconName])
+            : React.createElement(Icons.HelpOutline), // Fallback icon
+        }));
+        setBottomBarTabs(updatedTabs);
+        alert('Layout reset to default successfully!');
+      } else {
+        console.error('Default layout data is missing.');
+      }
+    } catch (error) {
+      console.error('Error resetting layout to default:', error);
+      alert('Failed to reset layout to default.');
+    }
+  };
+  
 
   return (
     <Box sx={{ padding: 2, marginTop: 10 }}>
@@ -84,6 +158,15 @@ const AppLayout = () => {
         onSave={handleSaveTab}
         tabData={editingTabIndex !== null ? bottomBarTabs[editingTabIndex] : null}
       />
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 3 }}>
+        <Button variant="contained" color="primary" onClick={handleSaveChanges}>
+          Save Changes
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={handleResetToDefault}>
+          Set to Default
+        </Button>
+      </Box>
     </Box>
   );
 };
