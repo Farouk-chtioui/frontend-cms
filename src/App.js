@@ -8,7 +8,7 @@ import AppLayout from './pages/AppLayout';
 import authService from './services/authService';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-
+import { RepoProvider } from './context/RepoContext';
 const App = () => {
   const isAuthenticated = authService.isAuthenticated();
   const location = useLocation();
@@ -38,9 +38,11 @@ const App = () => {
 
 const AppWrapper = () => (
   <Provider store={store}>
-    <Router>
-      <App />
-    </Router>
+    <RepoProvider>
+      <Router>
+        <App />
+      </Router>
+    </RepoProvider>
   </Provider>
 );
 
