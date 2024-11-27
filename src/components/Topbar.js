@@ -51,10 +51,18 @@ const Topbar = () => {
       const response = await repositoryService.getRepositories(userId);
       const fetchedRepos = response.data;
       setProjects(fetchedRepos);
+  
+      // Automatically select the first repository if none is selected
+      if (!selectedRepo && fetchedRepos.length > 0) {
+        const defaultRepo = fetchedRepos[0];
+        updateSelectedRepo(defaultRepo);
+        localStorage.setItem("selectedRepo", JSON.stringify(defaultRepo));
+      }
     } catch (error) {
       console.error("Failed to fetch repositories", error);
     }
   };
+  
 
  
   const handleSelectRepository = async (project) => {
@@ -105,18 +113,31 @@ const Topbar = () => {
         console.error("userId is null or undefined");
         return;
       }
-      await repositoryService.createRepository({
+      
+      // Step 1: Create the repository
+      const response = await repositoryService.createRepository({
         repositoryName,
         ownerId: userId,
-        appDesignId: "defaultAppDesignId", // You can either fetch or create an appDesignId here
+        appDesignId: "defaultAppDesignId", // Use a suitable appDesignId
       });
-      fetchRepositories();
+      
+      const newRepo = response.data; // Assuming the API response contains the new repository details
+      
+      // Step 2: Fetch the updated list of repositories
+      await fetchRepositories();
+  
+      // Step 3: Set the newly created repository as selected
+      updateSelectedRepo(newRepo);
+      localStorage.setItem("selectedRepo", JSON.stringify(newRepo));
+  
+      // Step 4: Reset the create dialog and input field
       setShowCreateDialog(false);
       setNewRepoName("");
     } catch (error) {
       console.error("Failed to create repository", error);
     }
   };
+  
 
   // Updated Publish function to ensure userId (ownerId), repositoryId, and appDesignId are used correctly
   const handlePublish = async () => {

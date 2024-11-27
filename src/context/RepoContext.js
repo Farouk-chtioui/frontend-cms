@@ -4,27 +4,27 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const RepoContext = createContext();
 
 export const RepoProvider = ({ children }) => {
-  // Retrieve initial state from localStorage
   const initialState = localStorage.getItem("selectedRepo");
   const [selectedRepo, setSelectedRepo] = useState(() => {
     try {
-      return initialState ? JSON.parse(initialState) : null; // Default to null if no repo is selected
+      return initialState ? JSON.parse(initialState) : null;
     } catch (error) {
       console.error("Failed to parse selectedRepo from localStorage:", error);
-      return null; // Fallback to null
+      return null;
     }
   });
 
   useEffect(() => {
-    // Update localStorage whenever selectedRepo changes
-    if (selectedRepo) {
-      localStorage.setItem("selectedRepo", JSON.stringify(selectedRepo));
-    } else {
+    const currentUserId = localStorage.getItem("userId");
+    const storedRepo = JSON.parse(localStorage.getItem("selectedRepo"));
+
+    // Reset selectedRepo if it doesn't belong to the current user
+    if (storedRepo && storedRepo.ownerId !== currentUserId) {
+      setSelectedRepo(null);
       localStorage.removeItem("selectedRepo");
     }
-  }, [selectedRepo]);
+  }, []);
 
-  // Rename `setSelectedRepo` to `updateSelectedRepo` for consistency
   const updateSelectedRepo = (repo) => {
     setSelectedRepo(repo);
   };
@@ -35,6 +35,7 @@ export const RepoProvider = ({ children }) => {
     </RepoContext.Provider>
   );
 };
+
 
 // Custom hook to use the RepoContext
 export const useRepo = () => {
